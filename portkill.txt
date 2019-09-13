@@ -1,0 +1,2 @@
+netstat -ao | find ":10790"
+taskkill /f /pid 5996
