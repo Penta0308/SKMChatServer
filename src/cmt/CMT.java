@@ -45,7 +45,7 @@ public class CMT extends Thread {
 				String[] split = fromClient.split(" ");
 				if(uid == -1)
 				{
-					if(split[0].compareTo("login") == 0) {
+					if(split[0].compareTo("login") == 0 && split.length == 3) {
 						try {
 							String exec = "SELECT uid FROM users WHERE email=? AND pw=?";
 							java.sql.Connection conn = DriverManager.getConnection(Data.dbURL, Data.dbID, Data.password);
@@ -60,14 +60,15 @@ public class CMT extends Thread {
 								st.close();
 								System.out.println(Integer.toString(uid));
 							    System.out.flush();
+							    continue;
 							} else {
 								bw.write("error login\r\n");
 								bw.write("fin\r\n");
 								bw.flush();
 								st.close();
+								conn.close();
 								break;
 							}
-							conn.close();
 						} catch (SQLException e) {
 							e.printStackTrace();
 							break;
@@ -77,6 +78,49 @@ public class CMT extends Thread {
 						bw.write("fin\r\n");
 					    bw.flush();
 					    break;
+					}
+				} else {
+					if(split[0].compareTo("join") == 0 && split.length == 2) {
+						try {
+							String exec = "SELECT sid FROM servers WHERE sid=?";
+							java.sql.Connection conn = DriverManager.getConnection(Data.dbURL, Data.dbID, Data.password);
+							java.sql.PreparedStatement st = conn.prepareStatement(exec);
+							st.setInt(1, Integer.parseInt(split[1]));
+							java.sql.ResultSet rs = st.executeQuery();
+							if(rs.next()) { //exist
+								
+							} else {
+								bw.write("error join");
+								bw.flush();
+							}
+							rs.close();
+							st.close();
+							conn.close();
+						} catch (SQLException e) {
+							e.printStackTrace();
+							break;
+						}
+					} else if(split[0].compareTo("create") == 0 && split.length == 2) {
+						try {
+							String exec = "INSERT INTO servers (name) VALUES (?)";
+							java.sql.Connection conn = DriverManager.getConnection(Data.dbURL, Data.dbID, Data.password);
+							java.sql.PreparedStatement st = conn.prepareStatement(exec);
+							st.setString(1, split[1]);
+							if(st.executeUpdate() != 1) {
+								bw.write("error create");
+								bw.flush();
+							}
+							exec = "CREATE TABLE ? (rid serial, name character varying(64))";
+							st = conn.prepareStatement(exec);
+							st.setString(1, "server-" + split[1]);
+							if(st.executeUpdate() != -1) {
+								bw.write("error create");
+								bw.flush();
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+							break;
+						}
 					}
 				}
 			    System.out.println(fromClient);
