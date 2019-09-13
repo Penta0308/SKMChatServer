@@ -1,3 +1,4 @@
 *.crt
 *.ks
 src/data/Data.java
+bin/data/Data.class
