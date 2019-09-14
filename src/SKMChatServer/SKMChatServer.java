@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -13,11 +15,14 @@ import javax.net.ssl.TrustManagerFactory;
 
 import cmt.CMT;
 
+import smt.SMT;
+
 import data.Data;
  
 public class SKMChatServer {
 	
 	public static SSLServerSocket sslserversocket;
+	public static Map<Integer, SMT> SMTList;
 	
 	private static SSLContext newSSLContext(final KeyStore ks, final String password, final String ksAlgorithm) throws Exception {
 		try {
@@ -69,6 +74,7 @@ public class SKMChatServer {
             sslserversocket.setEnabledCipherSuites(suites);
             
             ArrayList<CMT> CMTList = new ArrayList<CMT>();
+            SMTList = new HashMap<Integer, SMT>();
             
             System.out.println("Wating Connection");
             
